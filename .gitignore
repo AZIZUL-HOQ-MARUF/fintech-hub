@@ -1,0 +1,14 @@
+**/target/
+**/*.class
+.idea/
+*.iml
+.vscode/
+**/node_modules/
+**/dist/
+**/build/
+.DS_Store
+*.log
+**/.angular
+**/.vscode
+**/npm-debug.log
+**/yarn-error.log
