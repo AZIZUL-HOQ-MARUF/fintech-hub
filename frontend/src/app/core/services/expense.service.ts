@@ -34,6 +34,23 @@ export class ExpenseService {
     );
   }
 
+  updateExpense(id: number, expense: any, file?: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('expense', JSON.stringify(expense));
+    if (file) {
+      formData.append('file', file);
+    }
+    return this.http.put<any>(`${this.apiUrl}/${id}`, formData).pipe(
+      tap(() => this.loadExpenses())
+    );
+  }
+
+  deleteExpense(id: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}/deactivate`, {}).pipe(
+      tap(() => this.loadExpenses())
+    );
+  }
+
   loadExpenses() {
     this.http.get<any>(this.apiUrl).subscribe({
       next: (res) => {
