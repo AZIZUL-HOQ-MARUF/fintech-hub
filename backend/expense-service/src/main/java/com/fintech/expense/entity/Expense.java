@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.SQLRestriction;
 
 @Data
 @Builder
@@ -17,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "expenses")
+@SQLRestriction("is_live = true")
 public class Expense {
 
     @Id
@@ -44,6 +46,9 @@ public class Expense {
     @JoinColumn(name = "expense_id")
     @Builder.Default
     private List<FileMetadata> attachments = new ArrayList<>();
+
+    @Builder.Default
+    private boolean isLive = true;
 
     @PrePersist
     protected void onCreate() {

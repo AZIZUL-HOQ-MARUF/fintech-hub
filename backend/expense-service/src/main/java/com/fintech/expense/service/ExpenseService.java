@@ -68,6 +68,32 @@ public class ExpenseService {
         return mapToDto(saved);
     }
 
+    @Transactional
+    public ExpenseDto updateExpense(Long id, ExpenseDto dto, MultipartFile file) throws IOException {
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
+
+        expense.setDescription(dto.getDescription());
+        expense.setAmount(dto.getAmount());
+        expense.setCurrency(dto.getCurrency());
+
+        if (file != null && !file.isEmpty()) {
+            FileMetadata fileMetadata = saveFile(file);
+            expense.getAttachments().add(fileMetadata);
+        }
+
+        Expense updated = expenseRepository.save(expense);
+        return mapToDto(updated);
+    }
+
+    @Transactional
+    public void deleteExpense(Long id) {
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
+        expense.setLive(false);
+        expenseRepository.save(expense);
+    }
+
     public List<ExpenseDto> getExpensesByUserId(Long userId) {
         List<Expense> expenses = expenseRepository.findByUserId(userId);
         return expenses.stream()

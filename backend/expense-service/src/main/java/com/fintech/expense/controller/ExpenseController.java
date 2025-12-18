@@ -48,4 +48,21 @@ public class ExpenseController {
         List<ExpenseDto> expenses = expenseService.getExpensesByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success(expenses, "Fetched expenses successfully"));
     }
+
+    @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<ApiResponse<ExpenseDto>> updateExpense(
+            @PathVariable Long id,
+            @RequestParam("expense") String expenseJson,
+            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+
+        ExpenseDto dto = objectMapper.readValue(expenseJson, ExpenseDto.class);
+        return ResponseEntity.ok(ApiResponse.success(expenseService.updateExpense(id, dto, file),
+                "Expense updated successfully"));
+    }
+
+    @PutMapping("/{id}/deactivate")
+    public ResponseEntity<ApiResponse<Void>> deactivateExpense(@PathVariable Long id) {
+        expenseService.deleteExpense(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Expense deactivated successfully"));
+    }
 }
