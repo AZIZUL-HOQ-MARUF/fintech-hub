@@ -28,6 +28,6 @@ export class ExpenseListComponent {
   }
 
   refresh() {
-    this.expenseService.loadExpenses();
+    this.expenseService.expensesResource.reload();
   }
 }

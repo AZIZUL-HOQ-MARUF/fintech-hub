@@ -1,7 +1,7 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, resource } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, take } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, firstValueFrom } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
 export interface Expense {
@@ -20,7 +20,11 @@ export class ExpenseService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/${environment.apiVersion}/expenses`;
   
-  expenses = signal<Expense[]>([]);
+  readonly expensesResource = resource({
+    loader: () => firstValueFrom(this.http.get<any>(this.apiUrl).pipe(
+      map(res => res.data as Expense[])
+    ))
+  });
 
   createExpense(expense: any, file?: File): Observable<any> {
     const formData = new FormData();
@@ -29,7 +33,7 @@ export class ExpenseService {
       formData.append('file', file);
     }
     return this.http.post<any>(this.apiUrl, formData).pipe(
-      tap(() => this.loadExpenses())
+      tap(() => this.expensesResource.reload())
     );
   }
 
@@ -40,26 +44,13 @@ export class ExpenseService {
       formData.append('file', file);
     }
     return this.http.put<any>(`${this.apiUrl}/${id}`, formData).pipe(
-      tap(() => this.loadExpenses())
+      tap(() => this.expensesResource.reload())
     );
   }
 
   deleteExpense(id: number): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}/deactivate`, {}).pipe(
-      tap(() => this.loadExpenses())
+      tap(() => this.expensesResource.reload())
     );
-  }
-
-  loadExpenses() {
-    this.http.get<any>(this.apiUrl)
-      .pipe(take(1))
-      .subscribe({
-        next: (res) => {
-          if(res.data) {
-            this.expenses.set(res.data);
-          }
-        },
-        error: (err) => console.error('Failed to load expenses', err)
-      });
   }
 }

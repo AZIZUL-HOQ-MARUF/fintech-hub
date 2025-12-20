@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, DestroyRef } from '@angular/core';
+import { Component, inject, DestroyRef, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/auth/auth.service';
@@ -14,16 +14,19 @@ import { ZardButtonComponent } from '../../shared/components/button/button.compo
   imports: [CommonModule, ExpenseListComponent, ZardButtonComponent],
   templateUrl: './dashboard.component.html',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
   authService = inject(AuthService);
   expenseService = inject(ExpenseService);
   private dialogService = inject(ZardDialogService);
   private destroyRef = inject(DestroyRef);
+  expenses = computed(() => this.expenseService.expensesResource.value() ?? []);
   
-  expenses = this.expenseService.expenses;
+  totalExpenses = computed(() => {
+    return this.expenses().reduce((sum: number, e: Expense) => sum + (e.amount || 0), 0);
+  });
 
-  ngOnInit() {
-    this.expenseService.loadExpenses();
+  constructor() {
+    this.expenseService.expensesResource.reload();
   }
 
   openExpenseForm(expense?: Expense) {
@@ -36,11 +39,13 @@ export class DashboardComponent implements OnInit {
       zMaskClosable: false,
     });
 
-    dialogRef.afterClosed.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result: any) => {
-      if (result) {
-        this.expenseService.loadExpenses();
-      }
-    });
+    dialogRef.afterClosed
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result: any) => {
+        if (result) {
+          this.expenseService.expensesResource.reload();
+        }
+      });
   }
 
   logout() {
