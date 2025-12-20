@@ -26,7 +26,7 @@ export class ZardInputDirective {
   readonly zBorderless = input(false, { transform });
   readonly zSize = input<ZardInputSizeVariants>('default');
   readonly zStatus = input<ZardInputStatusVariants>();
-  readonly value = model<string>('');
+  readonly value = model<string | number | null | undefined>('');
 
   readonly size = linkedSignal<ZardInputSizeVariants>(() => this.zSize());
 
@@ -64,7 +64,11 @@ export class ZardInputDirective {
 
   protected updateValue(target: EventTarget | null): void {
     const el = target as HTMLInputElement | HTMLTextAreaElement | null;
-    this.value.set(el?.value ?? '');
+    if (el?.type === 'number') {
+      this.value.set(el.value);
+    } else {
+      this.value.set(el?.value ?? '');
+    }
   }
 
   getType(): ZardInputTypeVariants {
