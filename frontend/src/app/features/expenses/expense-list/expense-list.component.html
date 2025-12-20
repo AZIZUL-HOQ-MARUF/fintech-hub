@@ -1,4 +1,10 @@
 <z-card>
+    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+        <h2 class="text-lg font-semibold text-gray-800">Recent Expenses</h2>
+        <button z-button zType="ghost" zSize="sm" (click)="refresh()" class="text-gray-600 hover:text-blue-600">
+            <z-icon zType="refresh" zSize="sm" class="mr-1" /> Refresh
+        </button>
+    </div>
     <div class="overflow-hidden">
         <table z-table class="w-full">
             <thead z-table-header class="bg-gray-50/50">
@@ -21,7 +27,7 @@
                 </tr>
             </thead>
             <tbody z-table-body class="divide-y divide-gray-100">
-                <tr z-table-row *ngFor="let expense of expenses" class="hover:bg-gray-50/50 transition-colors">
+                <tr z-table-row *ngFor="let expense of expenses()" class="hover:bg-gray-50/50 transition-colors">
                     <td z-table-cell class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ expense.createdAt |
                         date:'mediumDate' }}</td>
                     <td z-table-cell class="px-6 py-4 text-sm font-medium text-gray-900">{{ expense.description }}</td>
@@ -39,15 +45,15 @@
                     <td z-table-cell class="px-6 py-4 text-right space-x-2">
                         <button z-button zType="ghost" zSize="sm" (click)="edit.emit(expense)"
                             class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-                            Edit
+                            <z-icon zType="edit" zSize="sm" /> Edit
                         </button>
                         <button z-button zType="ghost" zSize="sm" (click)="deleteExpense(expense.id)"
                             class="text-rose-600 hover:text-rose-700 hover:bg-rose-50">
-                            Delete
+                            <z-icon zType="trash" zSize="sm" /> Delete
                         </button>
                     </td>
                 </tr>
-                <tr *ngIf="expenses.length === 0">
+                <tr *ngIf="expenses().length === 0">
                     <td colspan="5" class="px-6 py-12 text-center text-gray-500 italic">
                         No expenses found. Click 'New Expense' to get started.
                     </td>

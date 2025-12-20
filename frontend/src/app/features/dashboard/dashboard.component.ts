@@ -1,5 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/auth/auth.service';
 import { Expense, ExpenseService } from '../expenses/services/expense.service';
 import { ExpenseListComponent } from '../expenses/expense-list/expense-list.component';
@@ -17,6 +18,7 @@ export class DashboardComponent implements OnInit {
   authService = inject(AuthService);
   expenseService = inject(ExpenseService);
   private dialogService = inject(ZardDialogService);
+  private destroyRef = inject(DestroyRef);
   
   expenses = this.expenseService.expenses;
 
@@ -34,7 +36,7 @@ export class DashboardComponent implements OnInit {
       zMaskClosable: false,
     });
 
-    dialogRef.afterClosed.subscribe((result: any) => {
+    dialogRef.afterClosed.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result: any) => {
       if (result) {
         this.expenseService.loadExpenses();
       }

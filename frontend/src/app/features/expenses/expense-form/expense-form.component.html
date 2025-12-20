@@ -1,19 +1,19 @@
-<form [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="space-y-6">
+<form (ngSubmit)="onSubmit()" class="space-y-6">
     <div class="space-y-2">
         <label class="text-sm font-semibold text-gray-700 ml-1">Description</label>
-        <input z-input formControlName="description" placeholder="e.g. Office Supplies"
+        <input z-input [field]="expenseForm.description" placeholder="e.g. Office Supplies"
             class="w-full h-11 border-gray-200 focus:border-blue-500 rounded-md" />
     </div>
 
     <div class="grid grid-cols-2 gap-4">
         <div class="space-y-2">
             <label class="text-sm font-semibold text-gray-700 ml-1">Amount</label>
-            <input z-input type="number" formControlName="amount" placeholder="0.00"
+            <input z-input type="number" [field]="expenseForm.amount" placeholder="0.00"
                 class="w-full h-11 border-gray-200 focus:border-blue-500 rounded-md" />
         </div>
         <div class="space-y-2">
             <label class="text-sm font-semibold text-gray-700 ml-1">Currency</label>
-            <select formControlName="currency"
+            <select [field]="expenseForm.currency"
                 class="flex h-11 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
@@ -42,7 +42,7 @@
         <button z-button zType="ghost" type="button" (click)="onCancel()" class="text-gray-600">
             Cancel
         </button>
-        <button z-button type="submit" [disabled]="expenseForm.invalid"
+        <button z-button type="submit" [disabled]="expenseForm().invalid()"
             class="bg-blue-600 hover:bg-blue-700 text-white px-8">
             {{ isEdit ? 'Update' : 'Create' }} Expense
         </button>
