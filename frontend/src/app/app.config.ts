@@ -5,12 +5,13 @@ import { provideZard } from '@/shared/core/provider/providezard';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { cacheInterceptor } from './core/interceptors/cache.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, cacheInterceptor])),
     provideZard()
   ]
 };
