@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
-import { Expense, ExpenseService } from '../../core/services/expense.service';
-import { ExpenseListComponent } from '../expenses/expense-list.component';
-import { ExpenseFormComponent } from '../expenses/expense-form.component';
+import { Expense, ExpenseService } from '../expenses/services/expense.service';
+import { ExpenseListComponent } from '../expenses/expense-list/expense-list.component';
+import { ExpenseFormComponent } from '../expenses/expense-form/expense-form.component';
 import { ZardDialogService } from '../../shared/components/dialog/dialog.service';
 import { ZardButtonComponent } from '../../shared/components/button/button.component';
 
