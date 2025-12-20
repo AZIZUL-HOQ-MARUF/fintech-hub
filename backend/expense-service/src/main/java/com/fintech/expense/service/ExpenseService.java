@@ -7,6 +7,8 @@ import com.fintech.expense.entity.FileMetadata;
 import com.fintech.expense.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class ExpenseService {
     private final String UPLOAD_DIR = "uploads/";
 
     @Transactional
+    @CacheEvict(value = "expenses", key = "#dto.userId")
     public ExpenseDto createExpense(ExpenseDto dto, MultipartFile file, String userEmail) throws IOException {
         // 1. Save File if exists
         FileMetadata fileMetadata = null;
@@ -69,6 +72,7 @@ public class ExpenseService {
     }
 
     @Transactional
+    @CacheEvict(value = "expenses", key = "#dto.userId")
     public ExpenseDto updateExpense(Long id, ExpenseDto dto, MultipartFile file) throws IOException {
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
@@ -87,13 +91,16 @@ public class ExpenseService {
     }
 
     @Transactional
-    public void deleteExpense(Long id) {
+    @CacheEvict(value = "expenses", key = "#result")
+    public Long deleteExpense(Long id) {
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
         expense.setLive(false);
         expenseRepository.save(expense);
+        return expense.getUserId();
     }
 
+    @Cacheable(value = "expenses", key = "#userId")
     public List<ExpenseDto> getExpensesByUserId(Long userId) {
         List<Expense> expenses = expenseRepository.findByUserId(userId);
         return expenses.stream()
