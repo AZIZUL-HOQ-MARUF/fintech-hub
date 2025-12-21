@@ -7,6 +7,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,10 +42,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     Long userId = jwtUtils.extractUserId(authHeader);
 
                     // Add headers for downstream services
-                    exchange.getRequest().mutate()
+                    ServerHttpRequest request = exchange.getRequest().mutate()
                             .header("X-User-Email", username)
                             .header("X-User-Id", String.valueOf(userId))
                             .build();
+
+                    return chain.filter(exchange.mutate().request(request).build());
 
                 } catch (Exception e) {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
