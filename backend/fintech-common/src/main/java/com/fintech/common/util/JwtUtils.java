@@ -25,10 +25,10 @@ public class JwtUtils {
     @Value("${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
     private String secretKey;
 
-    @Value("${jwt.expiration:86400000}")
+    @Value("${jwt.expiration:120000}") // 86400000
     private long jwtExpiration;
 
-    @Value("${jwt.refresh-expiration:604800000}")
+    @Value("${jwt.refresh-expiration:86400000}")
     private long refreshExpiration;
 
     public String extractUsername(String token) {

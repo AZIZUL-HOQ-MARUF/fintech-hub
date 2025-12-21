@@ -1,7 +1,6 @@
 package com.fintech.expense.controller;
 
 import com.fintech.common.dto.ApiResponse;
-import com.fintech.common.util.JwtUtils;
 import com.fintech.expense.dto.ExpenseDto;
 import com.fintech.expense.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
@@ -20,31 +19,25 @@ import java.util.List;
 public class ExpenseController {
 
     private final ExpenseService expenseService;
-    private final JwtUtils jwtUtils;
     private final ObjectMapper objectMapper;
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ApiResponse<ExpenseDto>> createExpense(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestHeader("X-User-Email") String userEmail,
             @RequestParam("expense") String expenseJson,
             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
 
-        String jwt = token.substring(7);
-        Long userId = jwtUtils.extractUserId(jwt);
-        String userEmail = jwtUtils.extractUsername(jwt);
-
         ExpenseDto dto = objectMapper.readValue(expenseJson, ExpenseDto.class);
-        dto.setUserId(userId); // Set userId from JWT token
+        dto.setUserId(userId);
 
         return ResponseEntity.ok(ApiResponse.success(expenseService.createExpense(dto, file, userEmail),
                 "Expense created successfully"));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ExpenseDto>>> getMyExpenses(@RequestHeader("Authorization") String token) {
-        String jwt = token.substring(7);
-        Long userId = jwtUtils.extractUserId(jwt);
-
+    public ResponseEntity<ApiResponse<List<ExpenseDto>>> getMyExpenses(
+            @RequestHeader("X-User-Id") Long userId) {
         List<ExpenseDto> expenses = expenseService.getExpensesByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success(expenses, "Fetched expenses successfully"));
     }
